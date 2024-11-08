@@ -1,0 +1,430 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index, follow">
+  <title>Self-declaration of identity (Memdeklaro de identeco)</title>
+  <meta name="description" content="Esperanto self-declaration of identity, an alternative to government ID">
+  <link href="favicon.ico" rel="shortcut icon">
+  <style>
+  @font-face {
+    font-family: "OCR-B";
+    src: url("OCR-B.ttf");
+  }
+  html {
+    font-family: sans-serif;
+  }
+  body {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 16px;
+  }
+  .preview {
+    width: 600px;
+    display: inline-block;
+    vertical-align: top;
+    background: #eee;
+    padding: 15px;
+  }
+  .preview .front, .preview .back {
+    margin-bottom: 10px;
+  }
+  .preview .front.default, .preview .back.default {
+    min-height: 300px;
+    width: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .preview .front.default .button, .preview .back.default .button {
+    display: none;
+  }
+  .preview .front.default {
+    background-image: url("fronto.jpg");
+  }
+  .preview .back.default {
+    background-image: url("dorso.jpg");
+  }
+  .preview canvas {
+    max-width: 100%;
+  }
+  .form {
+    width: calc(100% - 670px);
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 20px;
+  }
+  .form label {
+    display: block;
+    margin-bottom: 14px;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  input[type="text"], input[type="file"], textarea {
+    display: block;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #555;
+    padding: 2px 6px;
+    font-size: 15px;
+    margin-top: 4px;
+    margin-left: 4px;
+    vertical-align: top;
+  }
+  button, a.button {
+    font-size: 15px;
+    border: 1px solid green;
+    padding: 6px 24px;
+    border-radius: 5px;
+    background: lightgreen;
+    margin: 10px auto;
+    display: block;
+    text-decoration: none;
+    width: auto;
+    color: #000;
+    text-align: center;
+    cursor: pointer;
+  }
+  button:hover, a.button:hover {
+    background: green;
+    color: #fff;
+    text-decoration: none;
+  }
+  .info {
+    margin: 20px 100px;
+    line-height: 130%;
+  }
+  @media only screen and (max-width: 1100px) {
+    body {
+      max-width: calc(100% - 30px);
+    }
+    .preview {
+      width: calc(100% - 60px);
+      display: block;
+      margin: 10px auto;
+    }
+    .form {
+      width: calc(100% - 60px);
+      display: block;
+      margin: 10px auto;
+    }
+    .info {
+      margin: 20px 20px;
+    }
+    .preview .front, .preview .back {
+      margin: 10px auto;
+      max-width: 600px;
+    }
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="intro">
+      <h1>Self-declaration of identity (Memdeklaro de identeco)</h1>
+      <p>The self-declaration of identity is a philosophical project. Unfortunately it cannot be used for real-life situations such as jobs, apartment rentals, receiving mail, etc.</p>
+      <p>This generator works locally in your browser. No data is sent to a server or saved.</p>
+    </div>
+    <div class="preview">
+      <div class="front default">
+        <canvas id="canvas_front"></canvas>
+        <button id="download_front" class="button" onclick="download_front(); return false;">Download front</button>
+      </div>
+      <div class="back default">
+        <canvas id="canvas_back"></canvas>
+        <button id="download_back" class="button" onclick="download_back(); return false;">Download back</button>
+      </div>
+    </div>
+    <div class="form">
+      <form method="post" enctype="multipart/form-data" onsubmit="generate_mrz(); update_declaration(); return false;">
+        <label>
+          First name
+          <input type="text" name="first_name" id="first_name" maxlength="255" placeholder="First name" value="JOHN" required>
+        </label>
+        <label>
+          Surname
+          <input type="text" name="surname" id="surname" maxlength="255" placeholder="Surname" value="DOE" required>
+        </label>
+        <label>
+          Birth date
+          <input type="text" name="birth_date" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" id="birth_date" placeholder="YYYY-MM-DD" value="2000-01-01" required>
+        </label>
+        <label>
+          Date of issuance
+          <input type="text" name="issued" id="issued" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" placeholder="YYYY-MM-DD" value="2024-01-31" required>
+        </label>
+        <label>
+          Date of expiry
+          <input type="text" name="expiry" id="expiry" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" placeholder="YYYY-MM-DD" value="2029-01-31" required>
+        </label>
+        <label>
+          ID number (9 digits)
+          <input type="text" name="id_number" id="id_number" pattern="[0-9]{9}" placeholder="111222333" value="111222333" required>
+        </label>
+        <label>
+          Note
+          <textarea name="note" id="note" maxlength="255" placeholder="Note (max 2 lines)" required></textarea>
+        </label>
+        <label>
+          Issuer
+          <input type="text" name="issuer" id="issuer" maxlength="120" placeholder="EPO" value="EPO" required>
+        </label>
+        <label>
+          MRZ
+          <textarea name="mrz" id="mrz" placeholder="MRZ (Auto generated)" readonly></textarea>
+        </label>
+        <label>
+          Photo (35mm x 45mm)
+          <input type="file" name="photo" id="photo" accept="image/*">
+        </label>
+        <label>
+          Signature
+          <input type="file" name="signature" id="signature" accept="image/*">
+        </label>
+        <button class="button" type="submit" id="submit" name="submit">Generate</button>
+      </form>
+    </div>
+  </div>
+  <div class="info">
+    <h2>Warning</h2>
+    <p>ID documents do more harm than good and should not be seen as a solution for trust or authentication. Many economic and social interactions can be done anonymously. For other situations, trust can be achieved by simply saying your (self-chosen) name, using a web-of-trust, word-of-mouth reputation, vouches, memberships, escrows or cash deposits, and authentication can be achieved by using a password, cryptographic key pair (e.g. PGP, Bitcoin) or physical key or code (such as house keys or a safe code).</p>
+    <h2>Background</h2>
+    <p>In recent years, more and more things are asking for proof of identity, from basic necessities like jobs, housing and healthcare, to smaller things like receiving mail, buying a sim card or joining a gym. However, it is not enough to write your name and address on a form. Instead, only government-issued IDs are accepted, which gives the state a “monopoly on identity”.</p>
+    <p>Monopolies are dangerous in general due to the fact that if the service provider is harmful, inaccessible or otherwise problematic, you cannot choose a different provider, start your own provider, or go without. This particular monopoly is even worse, considering that access to government ID determines if you may participate in the economy (jobs, banking), society (housing, volunteer work, education, libraries, sports) or even exist (national borders).</p>
+    <p>Many people have no access to government ID. This group includes some stateless people, refugees, people who weren’t registered at birth, and people who escaped from child abuse, domestic abuse or cult abuse. The state’s claimed solutions, such as asylum procedures, stateless determination procedures, delayed registration of birth, child protective services and witness protection, often cannot help in practice, as the victim is often ignored, accused of lying, blamed for the persecution, or worse sent back to the persecutors against their will. Despite issuing laissez-passer and Nansen passports in the past, the United Nations and Red Cross do not issue alternative IDs today. It would be a relief if these processes would work and allow vulnerable people to escape from undeserved and dangerous situations, but unfortunately this is not the reality.</p>
+    <p>In addition, the collectivist concept of citizenship can be dangerous. For example, if someone does not identify with their birth culture, they should not be forced to follow it for life or identify themselves as a member of this culture. Instead, they should be free to dissent against this culture or leave this culture’s jurisdiction. Even worse is conscription - the cruel system where a nation-state can force someone against their will to kill or be killed, just because they happened to be born inside a certain territory. The world would be more free if people could exist as individuals, conscientious objectors against the fatalism of birth cultures and violence of statism, with freedom of association to leave hostile environments and join self-chosen communities.</p>
+    <p>“The blood of the covenant is thicker than the water of the womb.”</p>
+    <p>Self-declaration of identity gives people the power to decide their own fate. People are no longer the property of nations, governments, birth cultures or birth parents. The choice of your own name and renunciation of your circumstances of birth is a liberating act of individualism, where your ideals, actions and efforts matter more than the situation that you were arbitrarily born into.</p>
+    <h2>Self-declaration of identity</h2>
+    <p>Instead of requiring third parties such as birth countries, birth cultures and birth parents to define an individual’s identity, the self-declaration allows you to define your own name and eschews the concepts of birth countries and citizenship.</p>
+    <p>The self-declaration is a CR-80 plastic card or paper business card (85.6mm x 54mm). The self-declaration is written in Esperanto and includes the Esperanto flag and symbol. Esperanto was chosen because it is anational (sennacieca = not associated with a specific country, culture or state) and was created as a borderless language of peace, built on voluntary free association. The design features artwork of a peace dove in a blue sky with clouds.</p>
+    <p>As it is a self-declaration, it is not stored in a central database, does not require a third party’s permission and does not need to be issued by an authority. You are the authority over your own life.</p>
+    <p>The self-declaration includes the text:</p>
+    <ul>
+      <li>Title: Self-declaration of identity (Memdeklaro de identeco)</li>
+      <li>Location: Esperanto community (Esperantujo)</li>
+      <li>Issuer: EPO (ISO code for Esperanto)</li>
+      <li>Quote: One world, one humankind (Unu mondo, unu homaro)</li>
+    </ul>
+    <p>The self-declaration of identity contains:</p>
+    <ul>
+      <li>Self-chosen first name (Antaŭnomo) and self-chosen surname (Nomo) → an individual should be able to freely choose their own name</li>
+      <li>Birth date (Naskiĝdato) → for declaration of age</li>
+      <li>Photo → Dimensions 35mm x 45mm</li>
+      <li>Signature (Subskribo) → sign your self-declaration</li>
+      <li>Notes field (Notoj) → a place to write a note, e.g. “the holder is a conscientious objector” (Portanto estas konscienca obĵetanto)</li>
+      <li>ID number (Numero), issuance date (Eldondato), expiry date (Limdato), issuer (Eldonisto), MRZ → bureaucratic boilerplate</li>
+    </ul>
+    <p>The self-declaration of identity does not contain:</p>
+    <ul>
+      <li>Place of birth → allows people to cut ties with hostile environments and self-define their culture, beliefs and personal ties</li>
+      <li>Citizenship or stateless status → allows people to cut ties with hostile governments or cultures, and exist as an individual instead of as property of a state that they did not choose</li>
+      <li>Parents’ names → allows victims of child abuse to cut ties with abusers</li>
+    </ul>
+    <p>To make your own:</p>
+    <ul>
+      <li>Use the generator: Download this repo and open index.html in your browser</li>
+      <li>Or download the front template (fronto.jpg) and back template (dorso.jpg) and use an image editor such as GIMP to add your text (the font OCR-B.ttf is provided) and your photo and signature</li>
+      <li>Calculate the MRZ code here (TD1): <a href="https://www.dynamsoft.com/tools/mrz-generator/">https://www.dynamsoft.com/tools/mrz-generator/</a> or <a href="https://mrz.idtempl.com">https://mrz.idtempl.com</a> (Choose any country, then replace it with EPO)</li>
+      <li>Print it out as a business card and optionally laminate (dimensions: 85.6mm x 54mm) or order a CR-80 plastic card from a printing service</li>
+    </ul>
+    <p>Example:</p>
+    <img src="ekzemplo.jpg" alt="">
+    <p>Note:</p>
+    <p>Unfortunately the self-declaration of identity cannot be used to bypass government ID requirements, such as for jobs, housing, healthcare, finances, volunteer work, contracts, receiving mail or buying a sim card. Other non-government IDs such as Digitalcourage Lichtbildausweis and World Passport have the same limitations.</p>
+    <p>Nation-states’ refusal to print IDs for undocumented, stateless and unregistered people (while forcing government ID requirements on employers, landlords, doctors and more) can and does put innocent people’s lives in danger. But unfortunately even the United Nations has not been able to change this, despite issuing conventions on statelessness and refugee status in the 1950s.</p>
+    <h2>Further Reading</h2>
+    <p>For further reading about identity (and why the state’s monopoly is harmful):</p>
+    <p>Passports Were a “Temporary” War Measure - Speranta Dumitru
+    <a href="https://fee.org/articles/passports-were-a-temporary-war-measure">https://fee.org/articles/passports-were-a-temporary-war-measure</a></p>
+    <p>During World War II, we did have something to hide - Hans de Zwart
+    <a href="https://medium.com/@hansdezwart/during-world-war-ii-we-did-have-something-to-hide-40689565c550">https://medium.com/@hansdezwart/during-world-war-ii-we-did-have-something-to-hide-40689565c550</a></p>
+    <p>With each person left living on the streets, we are losing as a society - Petr Baroch
+    <a href="https://www.statelessness.eu/blog/each-person-left-living-streets-we-are-losing-society">https://www.statelessness.eu/blog/each-person-left-living-streets-we-are-losing-society</a></p>
+    <p>The rarely discussed dangers of KYC and what you can do about it - Anarkio
+    <a href="https://vonupodcast.com/know-your-customer-kyc-the-rarely-discussed-danger-guest-article-audio">https://vonupodcast.com/know-your-customer-kyc-the-rarely-discussed-danger-guest-article-audio</a></p>
+    <p>Exclusion and identity: life without ID - Privacy International
+    <a href="https://www.privacyinternational.org/long-read/2544/exclusion-and-identity-life-without-id">https://www.privacyinternational.org/long-read/2544/exclusion-and-identity-life-without-id</a></p>
+    <p>Proving who I am: the plight of people in detention without proof of legal identity - Vicki Prais
+    <a href="https://www.penalreform.org/blog/proving-who-i-am-the-plight-of-people/">https://www.penalreform.org/blog/proving-who-i-am-the-plight-of-people/</a></p>
+    <p>Establishing identity is a vital, risky and changing business - The Economist
+    <a href="https://www.economist.com/christmas-specials/2018/12/18/establishing-identity-is-a-vital-risky-and-changing-business">https://www.economist.com/christmas-specials/2018/12/18/establishing-identity-is-a-vital-risky-and-changing-business</a></p>
+    <p>What’s in a name? The case for inclusivity through anonymity - Common Thread
+    <a href="https://blog.twitter.com/common-thread/en/topics/stories/2021/whats-in-a-name-the-case-for-inclusivity-through-anonymity">https://blog.twitter.com/common-thread/en/topics/stories/2021/whats-in-a-name-the-case-for-inclusivity-through-anonymity</a></p>
+    <p>True Names Not Required: On Identity and Pseudonymity in Cyberspace - Der Gigi
+    <a href="https://dergigi.medium.com/true-names-not-required-fc6647dfe24a">https://dergigi.medium.com/true-names-not-required-fc6647dfe24a</a></p>
+    <p>Citizenship is obsolete - Samuela Davidova
+    <a href="https://medium.com/@DavidovaSamuela/citizenship-is-obsolete-c36a20056752">https://medium.com/@DavidovaSamuela/citizenship-is-obsolete-c36a20056752</a></p>
+    <h2>License</h2>
+    <p>Public Domain</p>
+    <h2>Translations</h2>
+    <p>Memdeklaro de identenco: self declaration of identity, autodeclaración de identidad, autodeclaração de identidade, autodéclaration d’identité, autodichiarazione di identità, autodeclararea identității, Selbsterklärung zur Identität, eigen verklaring van identiteit, Selvdeklaration af identitet, självdeklaration av identitet, egenerklæring om identitet, henkilöllisyysvakuutus, Isikuandmete esitamine, identitātes pašdeklarēšana, savęs deklaravimas, önbevallás a személyazonosságról, własna deklaracja tożsamości, vlastní prohlášení o totožnosti, vlastné vyhlásenie o totožnosti, samoprijava identitete, самодеклариране на самоличността, самопроголошення ідентичності, самозаявление о личности, αυτο-δήλωση ταυτότητας, pernyataan identitas diri, öz kimlik beyanı,  الإعلان الذاتي عن الهوية, 身份自报, 身份自報, 自己申告, 신원 자기 선언</p>
+  </div>
+  <hr>
+  <script>
+  function generate_mrz() {
+    var first_name = document.querySelector("#first_name").value;
+    var first_name = first_name.replace(/[\-\ ]/g, "<");
+    var first_name = first_name.normalize("NFD").replace(/[^A-Z\<]/gi, "").toUpperCase();
+    var surname = document.querySelector("#surname").value;
+    var surname = surname.replace(/[\-\ ]/g, "<");
+    var surname = surname.normalize("NFD").replace(/[^A-Z\<]/gi, "").toUpperCase();
+    var birth_date = document.querySelector("#birth_date").value;
+    var birth_date = birth_date.split("-").join("").substring(2);
+    var expiry = document.querySelector("#expiry").value;
+    var expiry = expiry.split("-").join("").substring(2);
+    var id_number = document.querySelector("#id_number").value;
+    var final = checksum(id_number + checksum(id_number) + birth_date + checksum(birth_date) + expiry + checksum(expiry));
+    var mrz1 = "I<EPO" + id_number + checksum(id_number) + "<<<<<<<<<<<<<<<";
+    var mrz2 = birth_date + checksum(birth_date) + "<" + expiry + checksum(expiry) + "<<<<<<<<<<<<<<" + final;
+    var mrz3 = surname + "<<" + first_name;
+    if(mrz3.length >= 30) {
+      var mrz3 = mrz3.slice(0, 29);
+    }
+    while(mrz3.length < 30) {
+      var mrz3 = mrz3 + "<";
+    }
+    document.querySelector("#mrz").value = mrz1 + "\n" + mrz2 + "\n" + mrz3;
+  }
+
+  function checksum(str) {
+    var counter = 0;
+    var total = 0;
+    for(var i = 0; i < str.length; i++) {
+      if(counter == 3) {
+        var counter = 0;
+      }
+      if(counter == 0) {
+        var total = total + (parseInt(str[i]) * 7);
+      }
+      if(counter == 1) {
+        var total = total + (parseInt(str[i]) * 3);
+      }
+      if(counter == 2) {
+        var total = total + (parseInt(str[i]) * 1);
+      }
+      counter++;
+    }
+    var check_digit = total % 10;
+    return check_digit;
+  }
+
+  function update_declaration() {
+    document.querySelector("#submit").innerText = "Generating, please wait...";
+    document.fonts.load("54px OCR-B").then(() => {
+      var surname = document.querySelector("#surname").value.toUpperCase();
+      var first_name = document.querySelector("#first_name").value.toUpperCase();
+      var birth_date = document.querySelector("#birth_date").value;
+      var issued = document.querySelector("#issued").value;
+      var expiry = document.querySelector("#expiry").value;
+      var id_number = document.querySelector("#id_number").value;
+      var note = document.querySelector("#note").value.toUpperCase();
+      var issuer = document.querySelector("#issuer").value.toUpperCase();
+      var mrz = document.querySelector("#mrz").value;
+      var photo = document.querySelector("#photo").files[0];
+      var signature = document.querySelector("#signature").files[0];
+    
+      var canvas_front = document.querySelector("#canvas_front");
+      var ctx_front = canvas_front.getContext("2d");
+      var template_front = new Image();
+      template_front.onload = () => {
+        document.querySelector(".front").classList.remove("default");
+        canvas_front.width = template_front.width;
+        canvas_front.height = template_front.height;
+        ctx_front.drawImage(template_front, 0, 0);
+        ctx_front.font = "58px OCR-B";
+        ctx_front.fillStyle = "rgb(0, 0, 0)";
+        ctx_front.textAlign = "left";
+        ctx_front.textBaseline = "top";
+        ctx_front.fillText(surname, 860, 335);
+        ctx_front.fillText(first_name, 860, 515);
+        ctx_front.font = "52px OCR-B";
+        ctx_front.fillText(birth_date, 860, 695);
+        ctx_front.fillText(issued, 860, 875);
+        ctx_front.fillText(expiry, 1420, 875);
+        ctx_front.fillText(id_number, 1420, 1055);
+        var add_photo = new Image();
+        add_photo.onload = () => {
+          var radius = 40;
+          var x1 = 60;
+          var x2 = 60 + 745;
+          var y1 = 256;
+          var y2 = 256 + 956;
+          ctx_front.beginPath();
+          ctx_front.moveTo((x1 + radius), y1);
+          ctx_front.arcTo(x2, y1, x2, y2, radius);
+          ctx_front.arcTo(x2, y2, x1, y2, radius);
+          ctx_front.arcTo(x1, y2, x1, y1, radius);
+          ctx_front.arcTo(x1, y1, x2, y1, radius);
+          ctx_front.closePath();
+          ctx_front.save();
+          ctx_front.clip();
+          ctx_front.drawImage(add_photo, 60, 256, 745, 956);
+          ctx_front.restore();
+        };
+        add_photo.src = URL.createObjectURL(photo);
+        var add_signature = new Image();
+        add_signature.onload = () => {
+          ctx_front.globalCompositeOperation = "multiply";
+          ctx_front.drawImage(add_signature, 870, 1055, Math.round(add_signature.width * (150 / add_signature.height)), 150);
+          ctx_front.globalCompositeOperation = "source-over";
+        };
+        add_signature.src = URL.createObjectURL(signature);
+        document.querySelector("#submit").innerText = "Generate";
+      };
+      template_front.src = "fronto.jpg";
+   
+      var canvas_back = document.querySelector("#canvas_back");
+      var ctx_back = canvas_back.getContext("2d");
+      var template_back = new Image();
+      template_back.onload = () => {
+        document.querySelector(".back").classList.remove("default");
+        canvas_back.width = template_back.width;
+        canvas_back.height = template_back.height;
+        ctx_back.drawImage(template_back, 0, 0);
+        ctx_back.font = "50px OCR-B";
+        ctx_back.fillStyle = "rgb(0, 0, 0)";
+        ctx_back.textAlign = "left";
+        ctx_back.textBaseline = "top";
+        var note_line_height = 70;
+        var note_lines = note.split("\n");
+        for(var i = 0; i < note_lines.length; i++) {
+          ctx_back.fillText(note_lines[i], 55, 155 + (note_line_height * i));
+        }
+        ctx_back.font = "58px OCR-B";
+        ctx_back.fillText(issuer, 55, 415);
+        ctx_back.font = "60px OCR-B";
+        var mrz_line_height = 90;
+        var mrz_lines = mrz.split("\n");
+        for(var i = 0; i < mrz_lines.length; i++) {
+          ctx_back.fillText(mrz_lines[i], 215, 890 + (mrz_line_height * i));
+        }
+      };
+      template_back.src = "dorso.jpg";
+    });
+  }
+  
+  function download_front() {
+    var download_link = document.createElement("a");
+    download_link.setAttribute("download", "front.png");
+    var canvas = document.querySelector("#canvas_front");
+    canvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      download_link.setAttribute("href", url);
+      download_link.click();
+    });
+  }
+
+  function download_back() {
+    var download_link = document.createElement("a");
+    download_link.setAttribute("download", "back.png");
+    var canvas = document.querySelector("#canvas_back");
+    canvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      download_link.setAttribute("href", url);
+      download_link.click();
+    });
+  }
+  </script>
+</body>
+</html>
