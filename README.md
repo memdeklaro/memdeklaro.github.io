@@ -4,7 +4,7 @@ The self-declaration of identity is a philosophical project. Unfortunately it ca
 
 ## Warning
 
-ID documents do more harm than good and should not be seen as a solution for trust or authentication. Many economic and social interactions can be done anonymously. For other situations, trust can be achieved by simply saying your (self-chosen) name, using a web-of-trust, word-of-mouth reputation, vouches, memberships, escrows or cash deposits, and authentication can be achieved by using a password, cryptographic key pair (e.g. PGP, Bitcoin) or physical key or code (such as house keys or a safe code).
+ID documents do more harm than good and should not be seen as a solution for trust or authentication. Many economic and social interactions can be done anonymously. For other situations, trust can be achieved by simply saying your (self-chosen) name, using a web-of-trust, word-of-mouth reputation, vouches, memberships, escrows or cash deposits, and authentication can be achieved by using a password, cryptographic key pair (e.g. PGP, Monero) or physical key or code (such as house keys or a safe code).
 
 ## Background
 
@@ -76,6 +76,9 @@ https://fee.org/articles/passports-were-a-temporary-war-measure
 
 During World War II, we did have something to hide - Hans de Zwart
 https://medium.com/@hansdezwart/during-world-war-ii-we-did-have-something-to-hide-40689565c550
+
+The Little-Known Passport That Protected 450,000 Refugees - Cara Giaimo
+https://www.atlasobscura.com/articles/nansen-passport-refugees
 
 With each person left living on the streets, we are losing as a society - Petr Baroch
 https://www.statelessness.eu/blog/each-person-left-living-streets-we-are-losing-society
